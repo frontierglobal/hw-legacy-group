@@ -21,8 +21,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Session:', session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log('User ID:', session.user.id);
         fetchUserRole(session.user.id);
       } else {
         setLoading(false);
@@ -31,8 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log('User ID on state change:', session.user.id);
         await fetchUserRole(session.user.id);
       } else {
         setRole(null);
@@ -45,11 +49,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Fetching role for user:', userId);
       const { data, error } = await supabase
         .from('users')
         .select('role')
         .eq('id', userId)
         .single();
+
+      console.log('Role fetch result:', { data, error });
 
       if (error) throw error;
       setRole(data?.role || null);
@@ -68,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn: async (email: string, password: string) => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (data?.user) {
+        console.log('Sign in successful, fetching role for:', data.user.id);
         await fetchUserRole(data.user.id);
       }
       return { data, error };
@@ -75,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp: async (email: string, password: string) => {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (data?.user) {
+        console.log('Sign up successful, fetching role for:', data.user.id);
         await fetchUserRole(data.user.id);
       }
       return { data, error };
