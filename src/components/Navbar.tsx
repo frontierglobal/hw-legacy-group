@@ -10,12 +10,17 @@ const Navbar: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log('Navbar: Starting sign out...');
       const { error } = await signOut();
-      if (!error) {
-        navigate('/', { replace: true });
+      if (error) {
+        console.error('Navbar: Sign out error:', error);
+        return;
       }
+      console.log('Navbar: Sign out successful, navigating to home...');
+      // Force a hard reload to clear all state
+      window.location.href = '/';
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Navbar: Error in handleSignOut:', error);
     }
   };
 
