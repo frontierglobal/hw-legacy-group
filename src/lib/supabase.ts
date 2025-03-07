@@ -58,8 +58,8 @@ export const signOut = async () => {
     sessionStorage.clear();
     localStorage.clear();
 
-    // Use window.location.replace instead of href to prevent back button issues
-    window.location.replace('/');
+    // Force a hard reload to clear all state
+    window.location.href = '/';
     return { error: null };
   } catch (error) {
     console.error('Sign out error:', error);
