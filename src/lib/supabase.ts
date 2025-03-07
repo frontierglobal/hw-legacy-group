@@ -50,10 +50,16 @@ export const signIn = async (email: string, password: string) => {
 
 export const signOut = async () => {
   try {
+    // First, sign out from Supabase
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    // Clear session storage manually
+
+    // Clear all storage
     sessionStorage.clear();
+    localStorage.clear();
+
+    // Force reload the page to clear any cached state
+    window.location.href = '/';
     return { error: null };
   } catch (error) {
     console.error('Sign out error:', error);
