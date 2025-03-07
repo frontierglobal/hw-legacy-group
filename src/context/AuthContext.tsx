@@ -91,17 +91,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut: async () => {
       try {
         console.log('Starting sign out process...');
+        
+        // First clear all storage
+        sessionStorage.clear();
+        localStorage.clear();
+        
+        // Then sign out from Supabase
         const { error } = await supabase.auth.signOut();
         if (error) {
           console.error('Supabase sign out error:', error);
           throw error;
         }
+        
         console.log('Supabase sign out successful');
         setUser(null);
         setRole(null);
-        // Clear any remaining session data
-        sessionStorage.clear();
-        localStorage.clear();
+        
         console.log('Local state cleared');
         return { error: null };
       } catch (error) {

@@ -17,8 +17,9 @@ const Navbar: React.FC = () => {
         return;
       }
       console.log('Navbar: Sign out successful, navigating to home...');
-      // Force a hard reload to clear all state
-      window.location.href = '/';
+      
+      // Force a complete page reload and clear all state
+      window.location.replace('/');
     } catch (error) {
       console.error('Navbar: Error in handleSignOut:', error);
     }
