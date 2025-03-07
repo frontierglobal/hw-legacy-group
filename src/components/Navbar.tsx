@@ -1,31 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import { Building2, LogOut, Menu, X } from 'lucide-react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Menu, X, LogOut } from 'lucide-react';
-import { getCurrentUser, signOut } from '../lib/supabase';
-import { User } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const { user, error } = await getCurrentUser();
-      if (user && !error) {
-        setUser({ id: user.id, email: user.email || '' });
-      }
-    };
-    
-    checkUser();
-  }, []);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
     if (!error) {
-      setUser(null);
       navigate('/');
     }
+  };
+
+  const renderAuthLinks = () => {
+    if (user) {
+      return (
+        <>
+          {role === 'admin' ? (
+            <Link to="/admin" className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700">
+              Admin Dashboard
+            </Link>
+          ) : (
+            <Link to="/dashboard" className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700">
+              User Dashboard
+            </Link>
+          )}
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
+          >
+            <LogOut className="h-4 w-4 mr-1" />
+            Sign Out
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link to="/login" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800">Login</Link>
+        <Link to="/register" className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700">Register</Link>
+      </>
+    );
+  };
+
+  const renderMobileAuthLinks = () => {
+    if (user) {
+      return (
+        <>
+          {role === 'admin' ? (
+            <Link to="/admin" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 hover:bg-blue-700">
+              Admin Dashboard
+            </Link>
+          ) : (
+            <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 hover:bg-blue-700">
+              User Dashboard
+            </Link>
+          )}
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800"
+          >
+            <LogOut className="h-4 w-4 mr-1" />
+            Sign Out
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">Login</Link>
+        <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 hover:bg-blue-700">Register</Link>
+      </>
+    );
   };
 
   return (
@@ -46,24 +97,7 @@ const Navbar: React.FC = () => {
               <Link to="/properties" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800">Properties</Link>
               <Link to="/businesses" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800">Businesses</Link>
               <Link to="/about" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800">About Us</Link>
-              
-              {user ? (
-                <>
-                  <Link to="/dashboard" className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700">Dashboard</Link>
-                  <button 
-                    onClick={handleSignOut}
-                    className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
-                  >
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800">Login</Link>
-                  <Link to="/register" className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700">Register</Link>
-                </>
-              )}
+              {renderAuthLinks()}
             </div>
           </div>
           
@@ -87,24 +121,7 @@ const Navbar: React.FC = () => {
             <Link to="/properties" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">Properties</Link>
             <Link to="/businesses" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">Businesses</Link>
             <Link to="/about" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">About Us</Link>
-            
-            {user ? (
-              <>
-                <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 hover:bg-blue-700">Dashboard</Link>
-                <button 
-                  onClick={handleSignOut}
-                  className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800"
-                >
-                  <LogOut className="h-4 w-4 mr-1" />
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800">Login</Link>
-                <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 hover:bg-blue-700">Register</Link>
-              </>
-            )}
+            {renderMobileAuthLinks()}
           </div>
         </div>
       )}
